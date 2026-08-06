@@ -11,3 +11,9 @@ $ ls -R
 app  docs
 ...
 \`\`\`
+## Git 설정
+\`\`\`bash
+$ git config --global user.name "..."
+$ git config --global user.email "..."
+$ git config --global init.defaultBranch main
+\`\`\`
