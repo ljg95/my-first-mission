@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My First Mission — 발표</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:#30363d;
+    --fg:#e6edf3; --muted:#8b949e; --accent:#2d6cdf; --accent2:#3fb950;
+    --code-bg:#010409;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Segoe UI',-apple-system,Arial,sans-serif;
+    background:var(--bg); color:var(--fg); overflow:hidden;
+  }
+  #deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute; inset:0; display:none;
+    flex-direction:column; justify-content:center;
+    padding:6vh 9vw; opacity:0; transition:opacity .35s ease;
+  }
+  .slide.active{display:flex; opacity:1}
+  .kicker{color:var(--accent2); font-weight:700; letter-spacing:.15em;
+    text-transform:uppercase; font-size:clamp(.7rem,1.4vw,1rem); margin-bottom:1.2rem}
+  h1{font-size:clamp(2rem,6vw,4.5rem); line-height:1.1; margin-bottom:1rem}
+  h2{font-size:clamp(1.6rem,4vw,3rem); line-height:1.15; margin-bottom:2rem; color:var(--accent)}
+  h2 .num{color:var(--muted); font-weight:400; margin-right:.6rem}
+  p.lead{font-size:clamp(1rem,2.2vw,1.6rem); color:var(--muted); line-height:1.6; max-width:60ch}
+  ul{list-style:none; display:flex; flex-direction:column; gap:1.1rem}
+  ul li{font-size:clamp(1rem,2.2vw,1.7rem); line-height:1.4; padding-left:2rem; position:relative}
+  ul li::before{content:"▸"; color:var(--accent2); position:absolute; left:0; top:0}
+  ul li b{color:var(--fg)}
+  ul li small{display:block; color:var(--muted); font-size:.7em; margin-top:.3rem; padding-left:.1rem}
+  code,pre{font-family:'Cascadia Code','Consolas',monospace}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px;
+    padding:1.2rem 1.4rem; font-size:clamp(.8rem,1.6vw,1.15rem); line-height:1.6;
+    overflow-x:auto; margin-top:1.2rem; max-width:70ch}
+  pre .c{color:var(--accent2)}  /* command */
+  pre .o{color:var(--muted)}    /* output  */
+  pre .k{color:var(--accent)}   /* keyword */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem}
+  .box{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.4rem 1.6rem}
+  .box h3{color:var(--accent); font-size:clamp(1rem,2vw,1.4rem); margin-bottom:.7rem}
+  .box p{color:var(--muted); font-size:clamp(.85rem,1.6vw,1.15rem); line-height:1.5}
+  .diagram{display:flex; align-items:center; justify-content:center; gap:0; margin-top:1.5rem; flex-wrap:wrap}
+  .node{background:var(--card); border:2px solid var(--accent); border-radius:12px;
+    padding:1.2rem 1.6rem; text-align:center; font-size:clamp(.8rem,1.6vw,1.2rem)}
+  .node.host{border-color:var(--accent2)}
+  .node small{display:block; color:var(--muted); font-size:.75em; margin-top:.3rem}
+  .arrow{color:var(--muted); font-size:clamp(1.2rem,3vw,2rem); padding:0 1rem;
+    display:flex; flex-direction:column; align-items:center}
+  .arrow small{font-size:.5em}
+  .tag{display:inline-block; background:rgba(45,108,223,.15); color:var(--accent);
+    border:1px solid var(--accent); border-radius:6px; padding:.15em .6em;
+    font-size:.6em; margin-left:.5rem; vertical-align:middle}
+  .center{align-items:center; text-align:center}
+  .center ul{align-items:flex-start; text-align:left}
+  .meta{display:flex; gap:2rem; margin-top:2rem; flex-wrap:wrap}
+  .meta div{color:var(--muted); font-size:clamp(.85rem,1.6vw,1.1rem)}
+  .meta b{color:var(--fg); display:block; font-size:1.2em; margin-bottom:.2rem}
+  /* progress + nav */
+  #bar{position:fixed; bottom:0; left:0; height:4px; background:var(--accent); transition:width .35s; z-index:10}
+  #hud{position:fixed; bottom:1.2rem; right:1.6rem; color:var(--muted);
+    font-size:.9rem; display:flex; gap:1rem; align-items:center; z-index:10}
+  #hud button{background:var(--card); border:1px solid var(--border); color:var(--fg);
+    border-radius:8px; width:38px; height:38px; font-size:1.1rem; cursor:pointer}
+  #hud button:hover{border-color:var(--accent)}
+  .hint{position:fixed; bottom:1.4rem; left:1.6rem; color:var(--muted); font-size:.85rem; z-index:10}
+  kbd{background:var(--card); border:1px solid var(--border); border-radius:5px; padding:.1em .5em; font-size:.85em}
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <!-- 1 표지 -->
+  <section class="slide center">
+    <div class="kicker">Docker · Linux · Git 실습</div>
+    <h1>My First Mission</h1>
+    <p class="lead">Docker 기반 웹 서버를 만들고,<br/>bind mount · 볼륨 영속성 · Git 연동을 검증하다</p>
+    <div class="meta">
+      <div><b>발표자</b>이재권</div>
+      <div><b>환경</b>Docker 29.3 · Linux · Git 2.43</div>
+      <div><b>저장소</b>github.com/ljg95/my-first-mission</div>
+    </div>
+  </section>
+
+  <!-- 2 목표 -->
+  <section class="slide">
+    <div class="kicker">Overview</div>
+    <h2><span class="num">01</span>이번 미션의 목표</h2>
+    <ul>
+      <li><b>Docker로 웹 서버 컨테이너를 직접 빌드</b><small>Dockerfile 작성 → 이미지 → 실행까지</small></li>
+      <li><b>포트 매핑</b>으로 호스트에서 컨테이너 서비스 접속<small>격리된 컨테이너를 밖에서 보기</small></li>
+      <li><b>Bind Mount / Volume</b>으로 데이터 전략 이해<small>실시간 반영 vs 영속 저장</small></li>
+      <li><b>Git / GitHub</b> 연동으로 버전 관리 & 협업<small>로컬 이력 → 원격 저장소</small></li>
+    </ul>
+  </section>
+
+  <!-- 3 아키텍처 -->
+  <section class="slide">
+    <div class="kicker">Architecture</div>
+    <h2><span class="num">02</span>한눈에 보는 구조</h2>
+    <div class="diagram">
+      <div class="node host">호스트 (내 PC)<small>브라우저 · app/ 폴더</small></div>
+      <div class="arrow">⇄<small>-p 8080:8080</small></div>
+      <div class="node">컨테이너<small>python http.server</small></div>
+    </div>
+    <p class="lead" style="margin-top:2rem">포트 매핑이 <b style="color:var(--accent2)">다리</b>를 놓고, 마운트/볼륨이 <b style="color:var(--accent2)">데이터</b>를 연결합니다.
+    <br/><span class="tag">지금 이 슬라이드도 이 컨테이너가 서빙 중!</span></p>
+  </section>
+
+  <!-- 4 Dockerfile -->
+  <section class="slide">
+    <div class="kicker">Build</div>
+    <h2><span class="num">03</span>Dockerfile — 단 6줄</h2>
+    <pre><span class="k">FROM</span> python:3.12-slim        <span class="o"># 경량 베이스</span>
+<span class="k">WORKDIR</span> /usr/src/app          <span class="o"># 작업 디렉터리</span>
+<span class="k">COPY</span> app /usr/src/app         <span class="o"># 웹 파일 복사</span>
+<span class="k">VOLUME</span> ["/usr/src/app/data"]  <span class="o"># 영속 데이터 지점</span>
+<span class="k">EXPOSE</span> 8080                    <span class="o"># 포트 명시</span>
+<span class="k">CMD</span> ["python3","-m","http.server","8080"]</pre>
+    <p class="lead" style="margin-top:1.2rem">FROM → COPY → CMD 순서로 "재료 → 조립 → 실행"을 정의합니다.</p>
+  </section>
+
+  <!-- 5 데모1 포트매핑 -->
+  <section class="slide">
+    <div class="kicker">Demo 1</div>
+    <h2><span class="num">04</span>포트 매핑 접속</h2>
+    <pre><span class="c">$ docker run -d -p 8080:8080 myfirstmission-web</span>
+<span class="c">$ curl -I http://localhost:8080</span>
+<span class="o">HTTP/1.0 200 OK</span>
+<span class="o">Server: SimpleHTTP/0.6 Python/3.12</span></pre>
+    <p class="lead" style="margin-top:1.2rem"><b style="color:var(--fg)">왜 필요한가?</b> 컨테이너는 격리된 네트워크 안에 있어요.
+    <br/><code>-p 8080:8080</code>으로 호스트 포트와 이어줘야 밖에서 볼 수 있습니다.</p>
+  </section>
+
+  <!-- 6 데모2 바인드마운트 -->
+  <section class="slide">
+    <div class="kicker">Demo 2</div>
+    <h2><span class="num">05</span>Bind Mount — 실시간 반영</h2>
+    <pre><span class="c">$ docker run -d -p 8081:8080 \
+    -v "$PWD/app":/usr/src/app python:3.12-slim ...</span>
+<span class="o"># 호스트에서 index.html 수정 →</span>
+<span class="c">$ curl -s http://localhost:8081 | grep "My First Mission"</span>
+<span class="o">&lt;h1&gt;My First Mission&lt;/h1&gt;</span></pre>
+    <p class="lead" style="margin-top:1.2rem">호스트 폴더를 컨테이너에 <b style="color:var(--accent2)">직접 연결</b> — 파일을 고치면 재빌드 없이 즉시 반영. <b>개발용</b>에 최적.</p>
+  </section>
+
+  <!-- 7 데모3 볼륨 -->
+  <section class="slide">
+    <div class="kicker">Demo 3</div>
+    <h2><span class="num">06</span>Volume — 데이터 영속성</h2>
+    <pre><span class="c">$ docker volume create myfirstmission-data</span>
+<span class="c">$ docker run --rm -v myfirstmission-data:/data \
+    busybox sh -c "echo volume-test > /data/volume.txt"</span>
+<span class="o"># 컨테이너 삭제(--rm) 후 다시 읽기</span>
+<span class="c">$ docker run --rm -v myfirstmission-data:/data busybox cat /data/volume.txt</span>
+<span class="o">volume-test  ✅ 데이터 유지됨</span></pre>
+    <p class="lead" style="margin-top:1rem">컨테이너를 지워도 <b style="color:var(--accent2)">Docker가 관리하는 저장소</b>에 데이터가 남습니다. <b>운영 데이터</b>용.</p>
+  </section>
+
+  <!-- 8 개념정리 -->
+  <section class="slide">
+    <div class="kicker">Concepts</div>
+    <h2><span class="num">07</span>핵심 개념 정리</h2>
+    <div class="grid">
+      <div class="box"><h3>Bind vs Volume</h3><p>Bind = 호스트 경로 직접 연결(개발·실시간). Volume = Docker가 관리(운영·영속).</p></div>
+      <div class="box"><h3>포트 매핑</h3><p>-p 호스트:컨테이너. 격리된 내부 서비스를 밖으로 노출하는 다리.</p></div>
+      <div class="box"><h3>권한 755 / 644</h3><p>r=4·w=2·x=1. 755=소유자 rwx, 그룹·기타 r-x. 644=rw- / r--.</p></div>
+      <div class="box"><h3>Git vs GitHub</h3><p>Git=로컬 버전관리 도구. GitHub=원격 협업·PR·이슈 플랫폼.</p></div>
+    </div>
+  </section>
+
+  <!-- 9 마무리 -->
+  <section class="slide center">
+    <div class="kicker">Wrap-up</div>
+    <h1 style="font-size:clamp(1.8rem,5vw,3.5rem)">배운 것 &amp; 다음 단계</h1>
+    <ul style="margin-top:1rem">
+      <li><b>이미지 → 컨테이너 → 서비스</b> 전체 흐름을 손으로 경험</li>
+      <li><b>데이터를 언제 Bind, 언제 Volume</b>으로 다뤄야 하는지 이해</li>
+      <li><b>모든 검증을 로그·증거로 문서화</b> → 재현 가능한 결과물</li>
+    </ul>
+    <p class="lead" style="margin-top:2rem;color:var(--accent2)">감사합니다 🙌 &nbsp; 질문 받겠습니다.</p>
+  </section>
+
+</div>
+
+<div id="bar"></div>
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> 또는 <kbd>Space</kbd> 로 이동 · <kbd>F</kbd> 전체화면</div>
+<div id="hud">
+  <span id="count">1 / 9</span>
+  <button onclick="go(-1)" aria-label="이전">‹</button>
+  <button onclick="go(1)" aria-label="다음">›</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function render(){
+    slides.forEach((s,n)=>s.classList.toggle('active',n===i));
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+  }
+  function go(d){ i=Math.min(slides.length-1,Math.max(0,i+d)); render(); }
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();go(1);}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){i=0;render();}
+    else if(e.key==='End'){i=slides.length-1;render();}
+    else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  });
+  render();
+</script>
+</body>
+</html>
